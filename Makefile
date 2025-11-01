@@ -1,13 +1,14 @@
-.PHONY: help build up down restart logs clean install-php install-node
+.PHONY: help build up down restart logs logs-app logs-bot logs-db ps shell-app shell-bot shell-db clean install-php install-node migrate fresh
 
 YELLOW := \033[1;33m
-GREEN := \033[1;32m
-RED := \033[1;31m
-NC := \033[0m 
+GREEN  := \033[1;32m
+RED    := \033[1;31m
+NC     := \033[0m 
 
 help:
 	@echo "$(GREEN)Available commands:$(NC)"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "$(YELLOW)%-20s$(NC) %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+	awk 'BEGIN {FS = ":.*?## "}; {printf "$(YELLOW)%-20s$(NC) %s\n", $$1, $$2}'
 
 build:
 	@echo "$(GREEN)Building containers...$(NC)"
@@ -21,7 +22,7 @@ up:
 	@echo "WhatsApp Bot: http://localhost:3000"
 	@echo "Caddy: http://localhost"
 
-down: ## Stop semua services
+down:
 	@echo "$(YELLOW)Stopping services...$(NC)"
 	docker-compose down
 
@@ -53,7 +54,7 @@ shell-bot:
 shell-db:
 	docker-compose exec db mysql -u appuser -p newdb
 
-clean: 
+clean:
 	@echo "$(RED)WARNING: This will remove all containers, volumes, and networks!$(NC)"
 	@read -p "Are you sure? [y/N] " -n 1 -r; \
 	echo; \
@@ -71,4 +72,7 @@ install-node:
 migrate:
 	docker-compose exec app php artisan migrate
 
-fresh: down build up
+fresh:
+	$(MAKE) down
+	$(MAKE) build
+	$(MAKE) up
