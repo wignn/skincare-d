@@ -1,0 +1,90 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./skincare-catalog/Dockerfile
+    container_name: skincare_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./app:/var/www/html
+      - ./storage:/var/www/html/storage
+    env_file:
+      - ./skincare-catalog/.env
+    depends_on:
+      - db
+    networks:
+      - app_network
+
+  db:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "edam15!k2Mp_"
+      MYSQL_DATABASE: "newdb"
+      MYSQL_USER: "appuser"
+      MYSQL_PASSWORD: "edam15!k2Mp_"
+    volumes:
+      - db_api:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - app_network
+
+  whatsapp-client:
+    build:
+      context: .
+      dockerfile: ./skincare-whatsapp-client/Dockerfile
+    container_name: skincare-whatsapp-client
+    restart: unless-stopped
+    ports:
+      - "5555:5555"
+    env_file:
+      - ./skincare-whatsapp-client/.env
+    volumes:
+      - ./logs:/app/logs
+      - whatsapp-session:/app/.wwebjs_auth
+      - whatsapp-cache:/app/.wwebjs_cache
+    networks:
+      - app_network
+    cap_add:
+      - SYS_ADMIN
+    shm_size: '2gb'
+
+  nginx:
+    image: nginx:alpine
+    container_name: skincare_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./app:/var/www/html
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - app
+    networks:
+      - app_network
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  db_api:
+    driver: local
+  whatsapp-session:
+    driver: local
+  whatsapp-cache:
+    driver: local
+
+networks:
+  app_network:
+    driver: bridge

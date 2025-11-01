@@ -1,0 +1,7 @@
+[submodule "skincare-catalog"]
+    path = skincare-catalog
+    url = https://github.com/wignn/skincare-catalog.git
+
+[submodule "skincare-whatsapp-client"]
+    path = skincare-whatsapp-client
+    url = https://github.com/wignn/skincare-whatsapp-client.git
