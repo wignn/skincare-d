@@ -1,0 +1,6 @@
+skincare.wign.cloud, www.skincare.wign.cloud {
+    encode zstd gzip
+    root * /var/www/html/public
+    php_fastcgi app:9000
+    file_server
+}

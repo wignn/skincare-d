@@ -15,6 +15,8 @@ services:
       - db
     networks:
       - app_network
+    expose:
+      - 8000
 
   db:
     image: mysql:latest
@@ -51,31 +53,22 @@ services:
       - SYS_ADMIN
     shm_size: '2gb'
 
-  nginx:
-    image: nginx:alpine
-    container_name: skincare_nginx
+  caddy:
+    image: caddy:latest
+    container_name: skincare_caddy
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ./app:/var/www/html
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
       - app
     networks:
       - app_network
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 volumes:
   db_api:
@@ -84,6 +77,8 @@ volumes:
     driver: local
   whatsapp-cache:
     driver: local
+  caddy_data:
+  caddy_config:
 
 networks:
   app_network:
