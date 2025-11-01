@@ -5,6 +5,8 @@ GREEN  := \033[1;32m
 RED    := \033[1;31m
 NC     := \033[0m 
 
+DOCKER := sudo docker compose
+
 help:
 	@echo "$(GREEN)Available commands:$(NC)"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -12,11 +14,11 @@ help:
 
 build:
 	@echo "$(GREEN)Building containers...$(NC)"
-	docker-compose build
+	$(DOCKER) build
 
 up:
 	@echo "$(GREEN)Starting services...$(NC)"
-	docker-compose up -d
+	$(DOCKER) up -d
 	@echo "$(GREEN)Services started!$(NC)"
 	@echo "PHP App: http://localhost:8080"
 	@echo "WhatsApp Bot: http://localhost:3000"
@@ -24,53 +26,53 @@ up:
 
 down:
 	@echo "$(YELLOW)Stopping services...$(NC)"
-	docker-compose down
+	$(DOCKER) down
 
 restart:
 	@echo "$(YELLOW)Restarting services...$(NC)"
-	docker-compose restart
+	$(DOCKER) restart
 
 logs:
-	docker-compose logs -f
+	$(DOCKER) logs -f
 
 logs-app:
-	docker-compose logs -f app
+	$(DOCKER) logs -f app
 
 logs-bot:
-	docker-compose logs -f whatsapp-bot
+	$(DOCKER) logs -f whatsapp-bot
 
 logs-db:
-	docker-compose logs -f db
+	$(DOCKER) logs -f db
 
 ps:
-	docker-compose ps
+	$(DOCKER) ps
 
 shell-app:
-	docker-compose exec app bash
+	$(DOCKER) exec app bash
 
 shell-bot:
-	docker-compose exec whatsapp-bot sh
+	$(DOCKER) exec whatsapp-bot sh
 
 shell-db:
-	docker-compose exec db mysql -u appuser -p newdb
+	$(DOCKER) exec db mysql -u appuser -p newdb
 
 clean:
 	@echo "$(RED)WARNING: This will remove all containers, volumes, and networks!$(NC)"
 	@read -p "Are you sure? [y/N] " -n 1 -r; \
 	echo; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		docker-compose down -v; \
+		$(DOCKER) down -v; \
 		echo "$(GREEN)Cleanup completed!$(NC)"; \
 	fi
 
 install-php:
-	docker-compose exec app composer install
+	$(DOCKER) exec app composer install
 
 install-node:
-	docker-compose exec whatsapp-bot npm install
+	$(DOCKER) exec whatsapp-bot npm install
 
 migrate:
-	docker-compose exec app php artisan migrate
+	$(DOCKER) exec app php artisan migrate
 
 fresh:
 	$(MAKE) down
