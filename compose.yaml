@@ -55,19 +55,6 @@ services:
     cap_add:
       - SYS_ADMIN
     shm_size: '2gb'
-  
-  vite:
-    build:
-      context: .
-      dockerfile: ./skincare-catalog/vite.dockerfile
-    container_name: vite
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./skincare-catalog:/app
-    stdin_open: true
-    tty: true
-
 
   caddy:
     image: caddy:latest
