@@ -9,6 +9,7 @@ services:
     volumes:
       - ./skincare-catalog/storage:/var/www/html/storage
       - ./skincare-catalog/bootstrap/cache:/var/www/html/bootstrap/cache
+      - ./skincare-catalog/public/build:/var/www/html/public/build
     env_file:
       - ./skincare-catalog/.env
     depends_on:
@@ -79,8 +80,7 @@ volumes:
   whatsapp-cache:
     driver: local
   caddy_data:
-  caddy_config:
-  app_public:  
+  caddy_config:  
 
 networks:
   app_network:
