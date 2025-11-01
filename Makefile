@@ -74,6 +74,10 @@ install-node:
 migrate:
 	$(DOCKER) exec app php artisan migrate
 
+image-sync:
+	${DOCKER} exec -it app php artisan storage:link
+
+
 fresh:
 	$(MAKE) down
 	$(MAKE) build
