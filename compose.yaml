@@ -8,8 +8,8 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      - ./skincare-catalog:/var/www/html
       - ./skincare-catalog/storage:/var/www/html/storage
+      - ./skincare-catalog/bootstrap/cache:/var/www/html/bootstrap/cache
     env_file:
       - ./skincare-catalog/.env
     depends_on:
@@ -59,7 +59,7 @@ services:
   vite:
     build:
       context: .
-      dockerfile: ./vite.dockerfile
+      dockerfile: ./skincare-catalog/vite.dockerfile
     container_name: vite
     ports:
       - "5173:5173"
