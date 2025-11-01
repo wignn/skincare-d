@@ -1,3 +1,12 @@
 skincare.wign.cloud {
-  reverse_proxy app:9000
+  root * /var/www/html/public
+  encode gzip
+  
+  php_fastcgi app:9000
+  
+  file_server
+  
+  log {
+    output file /var/log/caddy/access.log
+  }
 }
