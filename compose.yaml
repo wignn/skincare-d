@@ -1,5 +1,4 @@
 services:
-
   app:
     build:
       context: .
@@ -35,7 +34,6 @@ services:
     networks:
       - app_network
 
-
   whatsapp-client:
     build:
       context: .
@@ -58,14 +56,13 @@ services:
 
   caddy:
     image: caddy:latest
-    container_name: skincare_caddy
-    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./skincare-catalog:/var/www/html
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./skincare-catalog/public:/var/www/html/public
+      - ./logs:/var/log/caddy
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
@@ -82,6 +79,7 @@ volumes:
     driver: local
   caddy_data:
   caddy_config:
+  app_public:  
 
 networks:
   app_network:
