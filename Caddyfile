@@ -2,12 +2,10 @@ skincare.wign.cloud {
   root * /var/www/html/public
   encode gzip
   
-  # Handle PHP files through index.php (Laravel routing)
   php_fastcgi app:9000 {
     root /var/www/html/public
   }
   
-  # Serve static files or fallback to index.php
   file_server
   
   log {
