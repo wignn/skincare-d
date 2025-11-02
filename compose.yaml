@@ -9,7 +9,6 @@ services:
     volumes:
       - ./skincare-catalog/storage:/var/www/html/storage
       - ./skincare-catalog/bootstrap/cache:/var/www/html/bootstrap/cache
-      - ./skincare-catalog/public/build:/var/www/html/public/build
     env_file:
       - ./skincare-catalog/.env
     depends_on:
