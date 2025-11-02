@@ -6,6 +6,8 @@ services:
     container_name: skincare_app
     restart: unless-stopped
     working_dir: /var/www/html
+    volumes:
+      - app_public:/var/www/html/public
     env_file:
       - ./skincare-catalog/.env
     depends_on:
@@ -58,7 +60,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./skincare-catalog:/var/www/html
+      - app_public:/var/www/html/public:ro
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./cert:/etc/caddy/certs:ro
       - caddy_data:/data
@@ -69,6 +71,8 @@ services:
       - app_network
 
 volumes:
+  app_public:
+    driver: local
   db_api:
     driver: local
   whatsapp-session:

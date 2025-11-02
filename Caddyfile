@@ -1,21 +1,14 @@
 skincare.wign.cloud {
-  # Root directory untuk Laravel
   root * /var/www/html/public
   encode gzip
   
-  # SSL Certificate dari Cloudflare
   tls /etc/caddy/certs/origin_certificate.pem /etc/caddy/certs/private_key.pem
   
-  # Handle PHP files through index.php (Laravel routing)
-  php_fastcgi app:9000 {
-    try_files {path} /index.php?{query}
-  }
+  php_fastcgi app:9000
   
-  # Serve static files or fallback to index.php
   file_server
   
   log {
     output file /var/log/caddy/access.log
   }
 }
-
