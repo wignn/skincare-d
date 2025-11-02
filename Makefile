@@ -74,22 +74,11 @@ install-node:
 migrate:
 	$(DOCKER) exec app php artisan migrate
 
-image-sync:
-	${DOCKER} exec -it app php artisan storage:link
-
-sync-assets: 
-	@echo "$(GREEN)Syncing build assets...$(NC)"
-	@$(DOCKER) cp app:/var/www/html/public/build ./skincare-catalog/public/ || echo "$(RED)Container not running$(NC)"
-	@sudo chown -R 1001:1002 ./skincare-catalog/public/build 2>/dev/null || true
-	@sudo chmod -R 755 ./skincare-catalog/public/build 2>/dev/null || true
-	@echo "$(GREEN) Assets synced!$(NC)"
-
 rebuild: 
 	@echo "$(GREEN)Rebuilding and syncing...$(NC)"
 	@$(MAKE) build
 	@$(MAKE) up
 	@sleep 3
-	@$(MAKE) sync-assets
 	@echo "$(GREEN) Rebuild complete!$(NC)"
 
 fresh:
