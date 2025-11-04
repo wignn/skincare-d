@@ -30,6 +30,7 @@ jobs:
       run: |
         echo "${{ secrets.CATALOG_ENV }}" > skincare-catalog/.env
         echo "${{ secrets.WHATSAPP_ENV }}" > skincare-whatsapp-client/.env
+        echo "${{ secrets.DB_ENV }}" > .env
     
     - name: Deploy to server via SSH
       uses: appleboy/ssh-action@v1.0.0
@@ -38,39 +39,56 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          # Navigate to project directory
-          cd ~/skincare-d
+          # Set project directory
+          PROJECT_DIR=~/skincare-d
           
-          # Pull latest changes from main branch
-          git pull origin main
-          
-          # Update submodules to latest commit
-          git submodule update --remote --merge
+          # Check if directory exists, if not clone the repository
+          if [ ! -d "$PROJECT_DIR" ]; then
+            echo "Cloning repository for first time..."
+            git clone --recurse-submodules https://github.com/wignn/skincare-d.git $PROJECT_DIR
+            cd $PROJECT_DIR
+          else
+            echo "Project directory exists, updating..."
+            cd $PROJECT_DIR
+            
+            # Pull latest changes from main branch
+            git pull origin main
+            
+            # Update submodules to latest commit
+            git submodule update --init --recursive --remote --merge
+          fi
           
           # Stop all containers
+          echo "Stopping containers..."
           docker compose down
           
           # Rebuild images without cache
+          echo "Building images..."
           docker compose build --no-cache
           
           # Start containers in detached mode
+          echo "Starting containers..."
           docker compose up -d
           
           # Wait for containers to be ready
-          sleep 10
+          echo "Waiting for containers to be ready..."
+          sleep 15
           
           # Clear Laravel cache
-          docker compose exec -T app php artisan config:clear
-          docker compose exec -T app php artisan cache:clear
-          docker compose exec -T app php artisan view:clear
-          docker compose exec -T app php artisan route:clear
+          echo "🧹 Clearing Laravel cache..."
+          docker compose exec -T app php artisan config:clear || true
+          docker compose exec -T app php artisan cache:clear || true
+          docker compose exec -T app php artisan view:clear || true
+          docker compose exec -T app php artisan route:clear || true
           
           # Run migrations (if any)
-          docker compose exec -T app php artisan migrate --force
+          echo "Running migrations..."
+          docker compose exec -T app php artisan migrate --force || true
           
           # Optimize for production
-          docker compose exec -T app php artisan config:cache
-          docker compose exec -T app php artisan route:cache
-          docker compose exec -T app php artisan view:cache
+          echo "⚡ Optimizing for production..."
+          docker compose exec -T app php artisan config:cache || true
+          docker compose exec -T app php artisan route:cache || true
+          docker compose exec -T app php artisan view:cache || true
           
-          echo "✅ Deployment completed successfully!"
+          echo "Deployment completed successfully!"
