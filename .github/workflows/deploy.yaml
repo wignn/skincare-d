@@ -101,12 +101,13 @@ jobs:
           
           # Run migrations (if any)
           echo "Running migrations..."
-          $DOCKER_CMD compose exec -T app php artisan migrate --force || true
+          $DOCKER_CMD compose exec -T app php artisan migrate || true          
+          $DOCKER_CMD compose exec -T app php artisan db:seed || true
           
           # Optimize for production
           echo "Optimizing for production..."
           $DOCKER_CMD compose exec -T app php artisan config:cache || true
           $DOCKER_CMD compose exec -T app php artisan route:cache || true
           $DOCKER_CMD compose exec -T app php artisan view:cache || true
-          
+
           echo "Deployment completed successfully!"

@@ -74,6 +74,9 @@ install-node:
 migrate:
 	$(DOCKER) exec app php artisan migrate
 
+seed:
+	$(DOCKER) exec app php artisan db:seed
+
 rebuild: 
 	@echo "$(GREEN)Rebuilding and syncing...$(NC)"
 	@$(MAKE) build
