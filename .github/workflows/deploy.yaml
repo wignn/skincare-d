@@ -1,0 +1,76 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  repository_dispatch:
+    types: [submodule_update]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GH_PAT }}
+    
+    - name: Create cert directory
+      run: mkdir -p cert
+    
+    - name: Create SSL certificates from secrets
+      run: |
+        echo "${{ secrets.ORIGIN_CERTIFICATE }}" > cert/origin_certificate.pem
+        echo "${{ secrets.PRIVATE_KEY }}" > cert/private_key.pem
+    
+    - name: Create .env files from secrets
+      run: |
+        echo "${{ secrets.CATALOG_ENV }}" > skincare-catalog/.env
+        echo "${{ secrets.WHATSAPP_ENV }}" > skincare-whatsapp-client/.env
+    
+    - name: Deploy to server via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          # Navigate to project directory
+          cd ~/skincare-d
+          
+          # Pull latest changes from main branch
+          git pull origin main
+          
+          # Update submodules to latest commit
+          git submodule update --remote --merge
+          
+          # Stop all containers
+          docker compose down
+          
+          # Rebuild images without cache
+          docker compose build --no-cache
+          
+          # Start containers in detached mode
+          docker compose up -d
+          
+          # Wait for containers to be ready
+          sleep 10
+          
+          # Clear Laravel cache
+          docker compose exec -T app php artisan config:clear
+          docker compose exec -T app php artisan cache:clear
+          docker compose exec -T app php artisan view:clear
+          docker compose exec -T app php artisan route:clear
+          
+          # Run migrations (if any)
+          docker compose exec -T app php artisan migrate --force
+          
+          # Optimize for production
+          docker compose exec -T app php artisan config:cache
+          docker compose exec -T app php artisan route:cache
+          docker compose exec -T app php artisan view:cache
+          
+          echo "✅ Deployment completed successfully!"
