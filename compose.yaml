@@ -102,6 +102,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=${GF_USERS_ALLOW_SIGN_UP:-false}
       - GF_SERVER_ROOT_URL=http://localhost:3002
       - GF_INSTALL_PLUGINS=${GF_INSTALL_PLUGINS:-}
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/system-overview.json
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
