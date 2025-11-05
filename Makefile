@@ -1,4 +1,4 @@
-.PHONY: help build up down restart logs logs-app logs-bot logs-db ps shell-app shell-bot shell-db clean install-php install-node migrate fresh
+.PHONY: help build up down restart logs logs-app logs-bot logs-db logs-prometheus logs-grafana ps shell-app shell-bot shell-db clean install-php install-node migrate fresh monitoring
 
 YELLOW := \033[1;33m
 GREEN  := \033[1;32m
@@ -23,6 +23,8 @@ up:
 	@echo "PHP App: http://localhost:8080"
 	@echo "WhatsApp Bot: http://localhost:3000"
 	@echo "Caddy: http://localhost"
+	@echo "Prometheus: http://localhost:9090"
+	@echo "Grafana: http://localhost:3001 (admin/admin123)"
 
 down:
 	@echo "$(YELLOW)Stopping services...$(NC)"
@@ -43,6 +45,12 @@ logs-bot:
 
 logs-db:
 	$(DOCKER) logs -f db
+
+logs-prometheus:
+	$(DOCKER) logs -f prometheus
+
+logs-grafana:
+	$(DOCKER) logs -f grafana
 
 ps:
 	$(DOCKER) ps
@@ -88,3 +96,14 @@ fresh:
 	$(MAKE) down
 	$(MAKE) build
 	$(MAKE) up
+
+monitoring:
+	@echo "$(GREEN)Opening monitoring dashboards...$(NC)"
+	@echo "Prometheus: http://localhost:9090"
+	@echo "Grafana: http://localhost:3001"
+	@echo "Username: admin"
+	@echo "Password: admin123"
+	@echo ""
+	@echo "$(YELLOW)Recommended Grafana Dashboards to Import:$(NC)"
+	@echo "- Node Exporter Full (ID: 1860)"
+	@echo "- MySQL Overview (ID: 7362)"

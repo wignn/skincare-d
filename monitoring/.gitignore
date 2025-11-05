@@ -1,0 +1,10 @@
+# Ignore Grafana data
+grafana/
+
+# Ignore Prometheus data
+prometheus/
+
+# Keep config files
+!*.yml
+!*.yaml
+!README.md

@@ -1,0 +1,55 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'skincare-monitor'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alerts.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # MySQL/MariaDB exporter
+  - job_name: 'mysql'
+    static_configs:
+      - targets: ['mysql-exporter:9104']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'skincare_db'
+
+  # Caddy metrics
+  - job_name: 'caddy'
+    static_configs:
+      - targets: ['caddy:2019']
+
+  # Node exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # Laravel application metrics (if you add prometheus endpoint)
+  - job_name: 'laravel-app'
+    static_configs:
+      - targets: ['app:9000']
+    metrics_path: '/metrics'
+    scheme: http
+
+  # WhatsApp client metrics (if you add prometheus endpoint)
+  - job_name: 'whatsapp-client'
+    static_configs:
+      - targets: ['whatsapp-client:5555']
+    metrics_path: '/metrics'
+    scheme: http
