@@ -135,9 +135,10 @@ services:
     ports:
       - "9104:9104"
     environment:
-      - DATA_SOURCE_NAME=${MYSQL_USER}:${MYSQL_PASSWORD}@(db:3306)/${MYSQL_DATABASE}
+      DATA_SOURCE_NAME: "${MYSQL_USER}:${MYSQL_PASSWORD}@(db:3306)/"
     depends_on:
-      - db
+      db:
+        condition: service_started
     networks:
       - app_network
 
