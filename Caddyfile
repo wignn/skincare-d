@@ -1,4 +1,3 @@
-# External domain with TLS
 skincare.wign.cloud {
   root * /var/www/html/public
   encode gzip
@@ -17,6 +16,10 @@ skincare.wign.cloud {
 :80 {
   root * /var/www/html/public
   encode gzip
+  
+  handle /metrics {
+    php_fastcgi app:9000
+  }
   
   php_fastcgi app:9000
   

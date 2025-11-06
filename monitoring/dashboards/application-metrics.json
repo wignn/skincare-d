@@ -319,7 +319,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "time() - process_start_time_seconds{job=\"laravel-app\"}",
+          "expr": "time() - laravel_process_start_time_seconds{job=\"laravel-app\"}",
           "refId": "A"
         }
       ],

@@ -43,6 +43,8 @@ services:
     command: redis-server --appendonly yes
     networks:
       - app_network
+    ports:
+      - "6380:6379"
 
   whatsapp-client:
     build:
