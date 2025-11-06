@@ -12,6 +12,7 @@ services:
       - ./skincare-catalog/.env
     depends_on:
       - db
+      - redis
     networks:
       - app_network
     expose:
@@ -30,6 +31,18 @@ services:
     volumes:
       - db_api:/var/lib/mysql
     restart: unless-stopped
+    networks:
+      - app_network
+
+  redis:
+    image: redis:alpine
+    container_name: skincare_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
     networks:
       - app_network
 
@@ -134,6 +147,8 @@ volumes:
   app_public:
     driver: local
   db_api:
+    driver: local
+  redis_data:
     driver: local
   whatsapp-session:
     driver: local
