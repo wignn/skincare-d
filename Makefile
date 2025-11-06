@@ -100,10 +100,25 @@ fresh:
 monitoring:
 	@echo "$(GREEN)Opening monitoring dashboards...$(NC)"
 	@echo "Prometheus: http://localhost:9090"
-	@echo "Grafana: http://localhost:3001"
+	@echo "Grafana: http://localhost:3002"
 	@echo "Username: admin"
 	@echo "Password: admin123"
-	@echo ""
-	@echo "$(YELLOW)Recommended Grafana Dashboards to Import:$(NC)"
-	@echo "- Node Exporter Full (ID: 1860)"
-	@echo "- MySQL Overview (ID: 7362)"
+
+monitoring-verify: 
+	@echo "$(GREEN)Verifying monitoring setup...$(NC)"
+	@bash monitoring/verify-setup.sh
+
+monitoring-fix: ## 
+	@echo "$(YELLOW)Fixing common monitoring issues...$(NC)"
+	@sed -i 's/"uid": "PBFA97CFB590B2093"/"uid": "prometheus"/g' monitoring/dashboards/system-overview.json
+	@sudo docker restart skincare_grafana
+	@echo "$(GREEN)Monitoring fixed! Wait 15 seconds and refresh Grafana$(NC)"
+
+rebuild: 
+	@echo "$(GREEN)Rebuilding and syncing...$(NC)"
+	@$(MAKE) build
+	@$(MAKE) up
+	@sleep 5
+	@echo "$(GREEN)Rebuild complete!$(NC)"
+	@echo "$(YELLOW)Verifying monitoring setup...$(NC)"
+	@bash monitoring/verify-setup.sh

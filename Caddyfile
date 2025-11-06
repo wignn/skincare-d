@@ -12,3 +12,8 @@ skincare.wign.cloud {
     output file /var/log/caddy/access.log
   }
 }
+
+# Metrics endpoint for Prometheus (internal only)
+:2019 {
+  metrics
+}

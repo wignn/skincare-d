@@ -1,9 +1,6 @@
 global:
-  scrape_inter  # Node exporter for system metrics
-  - job_name: 'node-exporter'
-    static_configs:
-      - targets: ['node-exporter:9100']
-ion_interval: 15s
+  scrape_interval: 15s
+  evaluation_interval: 15s
   external_labels:
     monitor: 'skincare-monitor'
 
@@ -24,19 +21,30 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
+  # Caddy web server metrics
+  - job_name: 'caddy'
+    static_configs:
+      - targets: ['caddy:2019']
+    metrics_path: '/metrics'
+    scheme: http
+
   # Node exporter for system metrics
   - job_name: 'node-exporter'
     static_configs:
       - targets: ['node-exporter:9100']
 
-  # Laravel application metrics (if you add prometheus endpoint)
+  # Laravel application (monitoring via PHP-FPM status)
+  # Note: Requires /metrics endpoint in Laravel app
+  # See monitoring/LARAVEL_METRICS_SETUP.md for setup instructions
   - job_name: 'laravel-app'
     static_configs:
       - targets: ['skincare.wign.cloud']
     metrics_path: '/metrics'
     scheme: https
+    scrape_interval: 30s
+    scrape_timeout: 10s
 
-  # WhatsApp client metrics (if you add prometheus endpoint)
+  # WhatsApp client metrics
   - job_name: 'whatsapp-client'
     static_configs:
       - targets: ['whatsapp-client:5555']
