@@ -34,8 +34,6 @@ scrape_configs:
       - targets: ['node-exporter:9100']
 
   # Laravel application (monitoring via PHP-FPM status)
-  # Note: Requires /metrics endpoint in Laravel app
-  # See monitoring/LARAVEL_METRICS_SETUP.md for setup instructions
   - job_name: 'laravel-app'
     static_configs:
       - targets: ['caddy:80']
