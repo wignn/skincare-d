@@ -1,8 +1,8 @@
 services:
   app:
     build:
-      context: .
-      dockerfile: ./skincare-catalog/Dockerfile
+      context: ./skincare-catalog
+      dockerfile: Dockerfile
     container_name: skincare_app
     restart: unless-stopped
     working_dir: /var/www/html
